@@ -2,39 +2,47 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <vector>
 
 // A data structure to store key remappings
-static std::map<std::string, std::string> keyRemappings;
+static std::map<std::string, std::vector<Remapping>> appSpecificRemappings;
 
 // Function to add new key remappings
-void AddKeyRemapping(const std::string& originalKey, const std::string& remappedKey) {
+void AddKeyRemapping(const std::string& application, const std::string& originalKey, const std::string& remappedKey) {
     // Checking for any conflicts.
-    if (CheckForConflict(remappedKey)) {
-        std::cout << "Conflict detected: " << remappedKey << " is already in use!" << std::endl;
+    if (CheckForConflict(application, remappedKey)) {
+        std::cout << "Conflict detected: " << remappedKey << " is already in use in " << application << "!" << std::endl;
 
         return;
     };
 
     // Adding the remapping.
-    keyRemappings[originalKey] = remappedKey;
+    appSpecificRemappings[application].push_back({originalKey, remappedKey, application});
 
-    std::cout << "Remapped " << originalKey << " to " << remappedKey << std::endl;
+    std::cout << "Remapped " << originalKey << " to " << remappedKey << " for application: " << application << std::endl;
 };
 
 
-bool CheckForConflict(const std::string& targetKey) {
-    for (const auto& pair: keyRemappings) {
-        if (pair.second == targetKey)
-          return true;
-    }
+bool CheckForConflict(const std::string& application, const std::string& targetKey) {
+    if (appSpecificRemappings.find(application) == appSpecificRemappings.end()) return false;
+
+    for (const auto& remapping: appSpecificRemappings[application]) {
+        if (remapping.remappedKey == targetKey) return true;
+    };
 
     return false;
 };
 
 
-std::string GetRemappedKey(const std::string &originalKey) {
-    if (keyRemappings.find(originalKey) != keyRemappings.end()) {
-        return keyRemappings[originalKey];
+std::string GetRemappedKey(const std::string& application, const std::string &originalKey) {
+    if (appSpecificRemappings.find(application) != appSpecificRemappings.end()) {
+        return originalKey;
+    };
+
+    for(const auto& remapping : appSpecificRemappings[application]) {
+        if (remapping.originalKey == originalKey) {
+            return remapping.remappedKey;
+        };
     };
 
     return originalKey;
@@ -52,9 +60,11 @@ void SaveRemappingsToFile(const std::string &filename) {
     };
 
 
-    for(const auto& pair : keyRemappings) {
-        file << pair.first << " " << pair.second << std::endl;
-    }
+    for(const auto& [application, remappings] : appSpecificRemappings) {
+        for(const auto& remapping : remappings) {
+            file << application << " " << remapping.originalKey << " " << remapping.remappedKey << std::endl;
+        };
+    };
 
     file.close();
 
@@ -72,12 +82,12 @@ void LoadRemappingsFromFile(const std::string &filename) {
         return;
     };
 
-    keyRemappings.clear();      // Clear current remappings
+    appSpecificRemappings.clear();      // Clear current remappings
 
-    std::string originalKey, remappedKey;
+    std::string application, originalKey, remappedKey;
 
-    while(file >> originalKey >> remappedKey) {
-        keyRemappings[originalKey] = remappedKey;
+    while(file >> application >> originalKey >> remappedKey) {
+        appSpecificRemappings[application].push_back({originalKey, remappedKey, application});
     };
 
     file.close();
@@ -87,6 +97,6 @@ void LoadRemappingsFromFile(const std::string &filename) {
 
 
 // Getter for KeyRemappings
-std::map<std::string, std::string>& GetAllRemappings() {
-    return keyRemappings;
+std::map<std::string, std::vector<Remapping>>& GetAllRemappings() {
+    return appSpecificRemappings;
 };

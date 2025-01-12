@@ -92,22 +92,32 @@ LRESULT CALLBACK keyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
             // Detect Full key combinations.
             std::string keyCombo = GetKeyCombination(kbStruct);
 
-            // Check for remapping
-            std::string remappedKey = GetRemappedKey(keyCombo);
+            std::string activeWindow = GetActiveWindowTitle();
 
-            if (remappedKey != keyCombo) {
-                std::cout << "Key Pressed: " << keyCombo
-                          << " -> Remapped to: " << remappedKey << std::endl;
+            std::string activeExecutable = GetExecutableName(GetForegroundWindow());
 
-                // Simulate the remapped key combination.
-                SimulateKeyCombination(remappedKey);
+            std::map<std::string, std::vector<Remapping>> appSpecificRemappings = GetAllRemappings();
 
-                return 1;
+            for(const auto& [application, remappings] : appSpecificRemappings) {
+                if (activeExecutable.find(application) != std::string::npos) {
+                    for(const auto& remapping : remappings) {
+                        if (remapping.originalKey == keyCombo) {
+                            std::cout << "Key Pressed: " << keyCombo
+                                      << " in " << activeExecutable
+                                      << " -> Remapped to: " << remapping.remappedKey << std::endl;
+
+                            // Simulate the remapped key combination.
+                            SimulateKeyCombination(remapping.remappedKey);
+
+                            return 1;
+                        }
+                    };
+                }
             };
 
             // Outputting the key combination and the active window title.
             std::cout << "Key Pressed: " << keyCombo
-                      << " | Active Window: " << GetActiveWindowTitle() << std::endl;
+                      << " | Active Window: " << activeWindow << std::endl;
 
             // // Detect Ctrl+C and process it for remapping
             // if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (kbStruct->vkCode == 'C')) {

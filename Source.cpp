@@ -1,6 +1,8 @@
 #include "keyboard_hook/keyboard_hook.h"
 #include "key_remapper/key_remapper.h"
+#include "utils/utils.h"
 #include <iostream>
+#include <algorithm>
 
 #define FILENAME "remappings.txt"
 
@@ -16,6 +18,34 @@ void DisplayMenu() {
 };
 
 void AddNewRemapping() {
+    auto applications = GetRunningApplications();
+
+    if (applications.empty()) {
+        std::cout << "No running applications detected." << std::endl;
+
+        return;
+    };
+
+    // Display running applications.
+    std::cout << "Select an applicaiton to remap keys for:" << std::endl;
+
+    for (size_t i = 0; i < applications.size(); i++) {
+        std::cout << i + 1 << ". " << applications[i].windowTitle
+                  << " (" << applications[i].executableName << ")" << std::endl;
+    };
+
+    int choice;
+
+    std::cout << "Enter your choice (number): ";
+    std::cin >> choice;
+
+    if ((choice <= 0) || (choice > applications.size())) {
+        std::cout << "Invalid choice." << std::endl;
+
+        return;
+    };
+
+    std::string application = applications[choice - 1].executableName;
     std::string originalKey, remappedKey;
 
     std::cout << "Enter the original key combination (e.g., Ctrl+C): ";
@@ -24,40 +54,71 @@ void AddNewRemapping() {
     std::cout << "Enter the new key combination (e.g., Ctrl+Shift+P): ";
     std::cin >> remappedKey;
 
-    AddKeyRemapping(originalKey, remappedKey);
+    AddKeyRemapping(application, originalKey, remappedKey);
 };
 
 
 void ViewRemappings() {
     std::cout << "\n--- Current Remappings ---\n";
 
-    const std::map<std::string, std::string> &remappings = GetAllRemappings();
+    const std::map<std::string, std::vector<Remapping>> &appSpecificRemappings = GetAllRemappings();
 
-    for(const std::pair<std::string, std::string>& pair : remappings) {
-        std::cout << pair.first << " -> " << pair.second << std::endl;
+    for(const auto& [application, remappings] : appSpecificRemappings) {
+        std::cout << "Application: " << application << std::endl;
+
+        for(const auto& remapping : remappings) {
+            std::cout << "  " << remapping.originalKey << " -> " << remapping.remappedKey << std::endl;
+        };
     };
 
 
-    if (remappings.empty()) {
+    if (appSpecificRemappings.empty()) {
         std::cout << "No remappings available" << std::endl;
     };
 };
 
 
 void DeleteRemapping() {
-    std::string originalKey;
+    std::string application, originalKey;
+
+    // Get the application and key combination from the user.
+    std::cout << "Enter the application name (e.g., MS Word): ";
+    std::cin.ignore(); // Clear the input buffer.
+    std::getline(std::cin, application);
 
     std::cout << "Enter the original key combination to delete (e.g., Ctrl + C): ";
     std::cin >> originalKey;
 
-    std::map<std::string, std::string> &remappings = GetAllRemappings();
+    std::map<std::string, std::vector<Remapping>> &appSpecificRemappings = GetAllRemappings();
 
-    if (remappings.erase(originalKey)) {
-        std::cout << "Remapping for " << originalKey << " deleted." << std::endl;
+    // Checking to see if the application exists in the map.
+    if (appSpecificRemappings.find(application) != appSpecificRemappings.end()) {
+        auto &remappings = appSpecificRemappings[application];
+
+        // Find the remapping in the vector.
+        auto it = std::remove_if(remappings.begin(), remappings.end(),
+                                 [&originalKey](const Remapping &remapping)
+                                 {
+                                     return remapping.originalKey == originalKey;
+                                 });
+
+        if (it != remappings.end()) {
+            remappings.erase(it, remappings.end());     // Erasing the matched remapping.
+
+            std::cout << "Remapping for " << originalKey << " in " << application << " deleted." << std::endl;
+
+            if (remappings.empty()) {
+                appSpecificRemappings.erase(application);
+            }
+        }
+
+        else {
+            std::cout << "No remapping for " << originalKey << " found in " << application << "." << std::endl;
+        };
     }
 
     else {
-        std::cout << "No remapping found for " << originalKey << std::endl;
+        std::cout << "No remappings found for application: " << application << "." << std::endl;
     };
 };
 
@@ -71,8 +132,6 @@ int main(void) {
         }
         return FALSE;
     }, TRUE);
-
-    std::cout << "Starting keyboard Hook. Press ESC to exit." << std::endl;
 
     // Load remappings from file.
     LoadRemappingsFromFile(FILENAME);
