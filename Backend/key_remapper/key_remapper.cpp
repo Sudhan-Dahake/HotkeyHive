@@ -8,18 +8,20 @@
 static std::map<std::string, std::vector<Remapping>> appSpecificRemappings;
 
 // Function to add new key remappings
-void AddKeyRemapping(const std::string& application, const std::string& originalKey, const std::string& remappedKey) {
+bool AddKeyRemapping(const std::string& application, const std::string& originalKey, const std::string& remappedKey) {
     // Checking for any conflicts.
     if (CheckForConflict(application, remappedKey)) {
         std::cout << "Conflict detected: " << remappedKey << " is already in use in " << application << "!" << std::endl;
 
-        return;
+        return false;
     };
 
     // Adding the remapping.
     appSpecificRemappings[application].push_back({originalKey, remappedKey, application});
 
     std::cout << "Remapped " << originalKey << " to " << remappedKey << " for application: " << application << std::endl;
+
+    return true;
 };
 
 
@@ -88,6 +90,8 @@ void LoadRemappingsFromFile(const std::string &filename) {
 
     while(file >> application >> originalKey >> remappedKey) {
         appSpecificRemappings[application].push_back({originalKey, remappedKey, application});
+
+        std::cout << "application: " << application << ", original Key: " << originalKey << ", remapped key: " << remappedKey << std::endl;
     };
 
     file.close();
@@ -97,6 +101,6 @@ void LoadRemappingsFromFile(const std::string &filename) {
 
 
 // Getter for KeyRemappings
-std::map<std::string, std::vector<Remapping>>& GetAllRemappings() {
+std::map<std::string, std::vector<Remapping>> GetAllRemappings() {
     return appSpecificRemappings;
 };

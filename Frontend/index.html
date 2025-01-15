@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HotkeyHive</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f4f4f4;
+      }
+
+      #menu {
+          background-color: #333;
+          padding: 10px;
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+      }
+
+      #menu button {
+          background-color: #444;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          border-radius: 5px;
+          font-size: 16px;
+      }
+
+      #menu button:hover {
+          background-color: #555;
+      }
+
+      #content {
+          text-align: center; /* Center text within the div */
+          padding: 20px;
+          background-color: #fff; /* Optional: Add a background color for visibility */
+          border-radius: 10px; /* Optional: Rounded corners */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+      }
+
+      h2 {
+          color: #333;
+      }
+
+      /* .form-group {
+          margin-bottom: 15px;
+      } */
+
+      label {
+          display: block;
+          margin-top: 10px;
+          font-weight: bold;
+      }
+
+      input, select, button {
+          padding: 10px;
+          width: 100%;
+          max-width: 400px;
+          margin-top: 5px;
+          margin-bottom: 15px;
+          font-size: 16px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+      }
+
+      button {
+          background-color: #007BFF;
+          color: white;
+          cursor: pointer;
+      }
+
+      button:hover {
+          background-color: #218838;
+      }
+  </style>
+</head>
+<body>
+    <!-- <h1>Welcome to HotkeyHive</h1>
+    <p>This is my first Electron app!</p> -->
+
+    <div id="menu">
+        <button id="view-remappings">View Remappings</button>
+        <button id="add-remapping">Add Remapping</button>
+        <button id="delete-remapping">Delete Remappings</button>
+        <button id="start-hook">Start Hook</button>
+    </div>
+
+    <div id="content">
+        <h2>Welcome to Hotkey Hive</h2>
+        <p>Click a button above to begin managing your key remappings.</p>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,3 +1,6 @@
 Source.exe
 .vs
 .vscode
+node_modules/
+native_backend/build
+Frontend/remappings.txt
