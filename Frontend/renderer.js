@@ -148,6 +148,43 @@ window.addEventListener('DOMContentLoaded', () => {
                         applicationSelect.appendChild(option);
                     });
                 });
+
+
+                document.getElementById('submit-remapping-deletion').addEventListener('click', () => {
+                    const application = applicationSelect.value;
+                    const originalKey = document.getElementById('original-key').value;
+                    const feedbackMessage = document.getElementById('feedback-message');
+
+                    feedbackMessage.textContent = '';
+                    feedbackMessage.style.color = '';
+
+                    if (!application || !originalKey) {
+                        feedbackMessage.textContent = "Please fill in all the fields.";
+                        feedbackMessage.style.color = "red";
+
+                        return;
+                    };
+
+                    window.api.deleteRemapping(application, originalKey).then((success) => {
+                        if (success) {
+                            feedbackMessage.textContent = `Successfully deleted remapping of ${originalKey} for application -> ${application}`;
+
+                            feedbackMessage.style.color = "green";
+                        }
+
+                        else {
+                            feedbackMessage.textContent = "Failed to delete the remapping :(";
+
+                            feedbackMessage.style.color = "red";
+                        };
+                    }).catch((err) => {
+                        console.log("An Error error while trying to delete remapping. Error: ", err);
+
+                        feedbackMessage.textContent = "Error while trying to delete remapping.";
+
+                        feedbackMessage.style.color = "red";
+                    });
+                });
             }
 
             catch (err) {

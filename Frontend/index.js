@@ -79,7 +79,18 @@ ipcMain.handle('add-new-remapping', async (event, { application, originalKey, re
         console.error('Failed to add remapping: ', err.message);
 
         throw err;
+    };
+});
+
+
+ipcMain.handle('delete-remapping', async (event, { application, originalKey }) => {
+    try {
+        return backend.deleteRemapping(application, originalKey);
     }
+
+    catch (err) {
+        console.error('Failed to Delete remapping: ', err.message);
+    };
 });
 
 
