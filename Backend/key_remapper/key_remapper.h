@@ -13,14 +13,14 @@ struct Remapping {
 };
 
 // Function declarations for key remapping.
-bool AddKeyRemapping(const std::string& application, const std::string& originalKey, const std::string& remappedKey);
-bool CheckForConflict(const std::string& application, const std::string& targetKey);
-std::string GetRemappedKey(const std::string& application, const std::string& originalKey);
+bool AddKeyRemapping(std::map<std::string, std::vector<Remapping>>** appSpecificRemappings, const std::string &application, const std::string &originalKey, const std::string &remappedKey);
+bool CheckForConflict(std::map<std::string, std::vector<Remapping>>* ptrToAppSpecificRemappings, const std::string& application, const std::string& targetKey);
+// std::string GetRemappedKey(const std::string& application, const std::string& originalKey);
 
 
 // Save and Load remappings.
-void SaveRemappingsToFile(const std::string& filename);
-void LoadRemappingsFromFile(const std::string &filename);
+void SaveRemappingsToFile(std::map<std::string, std::vector<Remapping>>** ptrToAppSpecificRemappings, const std::string& filename);
+void LoadRemappingsFromFile(std::map<std::string, std::vector<Remapping>> **ptrToAppSpecificRemappings, const std::string &filename);
 
 // Getter for KeyRemappings
 std::map<std::string, std::vector<Remapping>> GetAllRemappings();

@@ -12,17 +12,17 @@ BackendState& BackendState::Instance() {
     return instance;
 }
 
-std::map<std::string, std::vector<Remapping>> BackendState::GetRemappingsInternally() {
-    return GetAllRemappings();
-};
+// std::map<std::string, std::vector<Remapping>> BackendState::GetRemappingsInternally() {
+//     return GetAllRemappings();
+// };
 
 // Function to initialize the backend (i.e., Load remapping from file).
-std::map<std::string, std::vector<Remapping>> BackendState::InitializeBackendForGUI() {
-    LoadRemappingsFromFile(FILENAME);
+void BackendState::InitializeBackendForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings) {
+    LoadRemappingsFromFile(&appSpecificRemappings, FILENAME);
 
     // this->backendMutex.lock();
 
-    return this->GetRemappingsInternally();
+    // return this->GetRemappingsInternally();
 
     // this->backendMutex.unlock();
 
@@ -43,18 +43,19 @@ std::map<std::string, std::vector<Remapping>> BackendState::InitializeBackendFor
 };
 
 // Function to add a new key remapping.
-bool BackendState::AddNewRemappingForGUI(const std::string &application, const std::string &originalKey, const std::string &remappedKey) {
+bool BackendState::AddNewRemappingForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings, const std::string &application, const std::string &originalKey, const std::string &remappedKey)
+{
     try {
-        std::cout << "Address of map inside AddNewRemappingForGUI: " << &this->appSpecificRemappings << std::endl;
-        // // Check if the map is empty
-        // if (this->appSpecificRemappings.empty())
-        // {
-        //     std::cout << "No remappings available." << std::endl;
-        //     return false;
-        // }
+        std::cout << "Address of map inside AddNewRemappingForGUI: " << appSpecificRemappings << std::endl;
+        // Check if the map is empty
+        if ((*appSpecificRemappings).empty())
+        {
+            std::cout << "No remappings available." << std::endl;
+            // return false;
+        }
 
         // Iterate through the map
-        for (const auto &[application, remappings] : this->appSpecificRemappings)
+        for (const auto &[application, remappings] : *appSpecificRemappings)
         {
             std::cout << "Application: " << application << std::endl;
 
@@ -66,13 +67,10 @@ bool BackendState::AddNewRemappingForGUI(const std::string &application, const s
             }
         }
 
-
-
-
-        bool success = AddKeyRemapping(application, originalKey, remappedKey);
+        bool success = AddKeyRemapping(&appSpecificRemappings, application, originalKey, remappedKey);
 
         if (success) {
-            SaveRemappingsForGUI();
+            SaveRemappingsForGUI(appSpecificRemappings);
         };
 
         return success;
@@ -85,20 +83,19 @@ bool BackendState::AddNewRemappingForGUI(const std::string &application, const s
     };
 };
 
-
-// Function to retrieve all remappings.
-std::map<std::string, std::vector<Remapping>> BackendState::GetAllRemappingForGUI() {
-    return this->appSpecificRemappings;
-};
+// // Function to retrieve all remappings.
+// std::map<std::string, std::vector<Remapping>> BackendState::GetAllRemappingForGUI() {
+//     return this->appSpecificRemappings;
+// };
 
 
 // function to delete a specific remapping.
-bool BackendState::DeleteRemappingForGUI(const std::string &application, const std::string &originalKey) {
+bool BackendState::DeleteRemappingForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings, const std::string &application, const std::string &originalKey) {
     // auto& appSpecificRemappings = GetAllRemappings();
 
     // Checking to see if the application exists in the map.
-    if (this->appSpecificRemappings.find(application) != this->appSpecificRemappings.end()) {
-        auto& remappings = this->appSpecificRemappings[application];
+    if ((*appSpecificRemappings).find(application) != (*appSpecificRemappings).end()) {
+        auto& remappings = (*appSpecificRemappings)[application];
 
         // Find the remapping in the vector.
         auto it = std::remove_if(remappings.begin(), remappings.end(),
@@ -111,7 +108,7 @@ bool BackendState::DeleteRemappingForGUI(const std::string &application, const s
 
             // If no remappings are left for the application then remove the application entry.
             if (remappings.empty()) {
-                this->appSpecificRemappings.erase(application);
+                (*appSpecificRemappings).erase(application);
             };
 
             return true;        // Remapping deleted successfully.
@@ -124,10 +121,10 @@ bool BackendState::DeleteRemappingForGUI(const std::string &application, const s
 
 
 // Function to save remappings to the file.
-void BackendState::SaveRemappingsForGUI() {
-    SaveRemappingsToFile(FILENAME);
+void BackendState::SaveRemappingsForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings)
+{
+    SaveRemappingsToFile(&appSpecificRemappings, FILENAME);
 };
-
 
 // Function to get the currently running applications.
 std::vector<ApplicationInfo> BackendState::GetRunningApplicationsForGUI() {
@@ -159,6 +156,6 @@ void BackendState::StartKeyboardHookForGUI() {
 
 
 // Function to gracefully shut down the backend.
-void BackendState::ShutdownBackendForGUI() {
-    this->SaveRemappingsForGUI();
+void BackendState::ShutdownBackendForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings) {
+    this->SaveRemappingsForGUI(appSpecificRemappings);
 };
