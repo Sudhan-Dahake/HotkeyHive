@@ -111,6 +111,8 @@ bool BackendState::DeleteRemappingForGUI(std::map<std::string, std::vector<Remap
                 (*appSpecificRemappings).erase(application);
             };
 
+            SaveRemappingsForGUI(appSpecificRemappings);
+
             return true;        // Remapping deleted successfully.
         };
     };
