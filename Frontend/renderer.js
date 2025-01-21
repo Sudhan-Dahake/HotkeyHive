@@ -1,22 +1,13 @@
 console.log("Renderer script loaded successfully.");
 
-// const addRemapping = require('./scripts/components/addRemapping');
-
-// // Attach the event listener to the "Add Remapping" button
-// document.getElementById('add-remapping').addEventListener('click', () => {
-//   addRemapping();
-// });
-
-// // Attach the event listener to the "Add Remapping" button.
-// document.getElementById('add-remapping').addEventListener('click', () => {
-//     addRemapping(window.api);
-// });
-
 // Wait for DOM to load.
 console.log("Inside Renderer.js, top level.");
 
 window.addEventListener('DOMContentLoaded', () => {
     const addRemappingButton = document.getElementById('add-remapping');
+    const deleteRemappingButton = document.getElementById('delete-remapping');
+    const viewRemappingButton = document.getElementById('view-remappings');
+    const startHookButton = document.getElementById('start-hook');
 
     console.log("Inside renderer.js, addRemappingButton's value: ", addRemappingButton);
 
@@ -63,20 +54,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
                         option.value = app.executableName;
 
-                        option.textContent = `${app.windowTitle} (${app.executableName})`;
+                        option.textContent = `${app.executableName}`;
 
                         applicationSelect.appendChild(option);
                     });
                 });
-
-                //   const applications = backend.getRunningApplications();
-
-                //   applications.forEach(app => {
-                //     const option = document.createElement('option');
-                //     option.value = app.executableName;
-                //     option.textContent = `${app.windowTitle} (${app.executableName})`;
-                //     applicationSelect.appendChild(option);
-                //   });
 
 
                 // Adding event Listener to the "Add Remapping" Button.
@@ -120,12 +102,61 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             catch (err) {
-                console.log("Inside renderer.js, addRemapping can't be called. Error: ", err);
+                console.log("Inside renderer.js (add remapping). Error: ", err);
             }
         });
     }
 
     else {
-        console.error('Add Remapping button not found in the DOM.');
+        console.error('Add Remapping Button not found in the DOM.');
     };
+
+
+
+    if (deleteRemappingButton) {
+        deleteRemappingButton.addEventListener('click', () => {
+            try {
+                const contentDiv = document.getElementById('content');
+
+                contentDiv.innerHTML = `
+                <h2>Delete Exisiting Remapping(s)</h2>
+                <div>
+                    <label for="application-select">Select Application</label>
+                    <select id="application-select"></select>
+                </div>
+
+                <div>
+                    <label for="original-key">Original Key</label>
+                    <input type="text" id="original-key" placeholder="Please enter the key that is remapped.">
+                </div>
+
+                <button id="submit-remapping-deletion">Delete Remapping</button>
+
+                <div id="feedback-message" style="margin-top: 10px;"></div>
+                `;
+
+                const applicationSelect = document.getElementById('application-select');
+
+                window.api.getExecutableName().then((applications) => {
+                    applications.forEach((app) => {
+                        const option = document.createElement('option');
+
+                        option.value = app.executableName;
+
+                        option.textContent = `${app.executableName}`;
+
+                        applicationSelect.appendChild(option);
+                    });
+                });
+            }
+
+            catch (err) {
+                console.log("Inside renderer.js (delete remapping). Error: ", err);
+            }
+        });
+    }
+
+    else {
+        console.error('Delete Remapping Button not found in the DOM.')
+    }
  });
