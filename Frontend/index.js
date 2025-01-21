@@ -46,6 +46,17 @@ app.on('ready', () => {
 // });
 
 
+ipcMain.handle('get-executable-name', async () => {
+    try {
+        return backend.getExecutableName();
+    }
+
+    catch (err) {
+        console.error("Failed to get current Executable names: ", err.message);
+    };
+});
+
+
 ipcMain.handle('get-running-applications', async () => {
     try {
         return backend.getRunningApplications();

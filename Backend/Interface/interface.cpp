@@ -128,7 +128,22 @@ void BackendState::SaveRemappingsForGUI(std::map<std::string, std::vector<Remapp
 
 // Function to get the currently running applications.
 std::vector<ApplicationInfo> BackendState::GetRunningApplicationsForGUI() {
-    return GetRunningApplications();
+    std::vector<ApplicationInfo> applications = GetRunningApplications();
+
+    // Sorting by executableName.
+    std::sort(applications.begin(), applications.end(), [](const ApplicationInfo &a, const ApplicationInfo &b) {
+        return a.executableName < b.executableName;
+    });
+
+    // Removing duplicates based on executableName.
+    auto last = std::unique(applications.begin(), applications.end(), [](const ApplicationInfo &a, const ApplicationInfo &b) {
+        return a.executableName == b.executableName;
+    });
+
+    // Resizing the vector to remove the redundant elements.
+    applications.erase(last, applications.end());
+
+    return applications;
 };
 
 
