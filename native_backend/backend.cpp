@@ -3,6 +3,7 @@
 
 class BackendHandler {
     std::map<std::string, std::vector<Remapping>> appSpecificRemappings;
+    std::atomic<bool> hookRunning;
 
     // Private constructor to prevent direct instantiation.
     BackendHandler() = default;
@@ -247,6 +248,19 @@ public:
     };
 
 
+    // Stop Keyboard Hook.
+    Napi::Value StopKeyboardHookExpose(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
+
+        // Accessing the singleton instance.
+        BackendState &backend = BackendState::Instance();
+
+        backend.StopKeyboardHookForGUI();
+
+        return env.Undefined();
+    }
+
+
     // Shutdown Backend.
     Napi::Value ShutdownBackendExpose(const Napi::CallbackInfo &info) {
         Napi::Env env = info.Env();
@@ -270,12 +284,10 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
         return backendHandler.InitializeBackendExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("addNewRemapping", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.AddNewRemappingExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("getAllRemappings", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.GetAllRemappingsExpose(info);
     }));
@@ -284,32 +296,32 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
         return backendHandler.GetRemappedApplicationsNameExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("deleteRemapping", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.DeleteRemappingExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("saveRemappings", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.SaveRemappingsExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("getRunningApplications", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.GetRunningApplicationsExpose(info);
     }));
 
-    // Exposing backend functions to JavaScript.
     exports.Set("startKeyboardHook", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.StartKeyboardHookExpose(info);
     }));
 
-            // Exposing backend functions to JavaScript.
+    exports.Set("stopKeyboardHook", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
+        return backendHandler.StopKeyboardHookExpose(info);
+    }));
+
     exports.Set("shutdownBackend", Napi::Function::New(env, [&backendHandler](const Napi::CallbackInfo& info) {
         return backendHandler.ShutdownBackendExpose(info);
     }));
 
-    return exports; // Return the exported functions.
+    // Returning the exported functions.
+    return exports;
 };
 
 // Register the module with Node.js.

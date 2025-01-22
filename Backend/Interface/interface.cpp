@@ -5,6 +5,12 @@
 // // Define and initialize the static map
 // std::map<std::string, std::vector<Remapping>> BackendState::appSpecificRemappings = {};
 
+BackendState::BackendState(){
+    this->hookRunning.store(false);
+
+    this->hookThread = nullptr;
+};
+
 BackendState& BackendState::Instance() {
 
     static BackendState instance;
@@ -151,26 +157,56 @@ std::vector<ApplicationInfo> BackendState::GetRunningApplicationsForGUI() {
 
 // Function to start the keyboard hook.
 void BackendState::StartKeyboardHookForGUI() {
-    InstallKeyboardHook();
+    if (this->hookRunning.load()) {
+        std::cout << "Keyboard hook is already running!!" << std::endl;
 
-    MSG msg;
+        return;
+    };
 
-    // Message loop to keep the hook alive.
-    while (!exitProgram)
-    {
-      if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-      {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-      }
-    }
+    this->hookRunning.store(true);
 
-    // Cleanup -> Removing the hook.
-    RemoveKeyboardHook();
+    // Creating a new thread for running the hook.
+    this->hookThread = new std::thread([this]() {
+        InstallKeyboardHook(&(this->hookRunning));
 
-    exitProgram = false;
+        MSG msg;
+
+        // Message loop to keep the hook alive.
+        while (this->hookRunning.load()) {
+            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+
+                DispatchMessage(&msg);
+            }
+        }
+
+        // Cleanup -> Removing the hook.
+        RemoveKeyboardHook();
+    });
 };
 
+void BackendState::StopKeyboardHookForGUI() {
+    // Checking to see if the hook is running.
+    if (!this->hookRunning.load()) {
+        std::cout << "Keyboard hook is not running!!" << std::endl;
+
+        return;
+    };
+
+    // Signaling the thread to stop.
+    this->hookRunning.store(false);
+
+    // Wait for the thread to finish.
+    if (this->hookThread && this->hookThread->joinable()) {
+        this->hookThread->join();
+    };
+
+
+    // Cleaning up the thread object.
+    delete this->hookThread;
+
+    this->hookThread = nullptr;
+};
 
 // Function to gracefully shut down the backend.
 void BackendState::ShutdownBackendForGUI(std::map<std::string, std::vector<Remapping>>* appSpecificRemappings) {

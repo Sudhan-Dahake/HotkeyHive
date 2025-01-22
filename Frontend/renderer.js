@@ -7,7 +7,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const addRemappingButton = document.getElementById('add-remapping');
     const deleteRemappingButton = document.getElementById('delete-remapping');
     const viewRemappingButton = document.getElementById('view-remappings');
-    const startHookButton = document.getElementById('start-hook');
+    const hookButton = document.getElementById('hook');
+
+    let isHookRunning = false;
 
     console.log("Inside renderer.js, addRemappingButton's value: ", addRemappingButton);
 
@@ -195,5 +197,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
     else {
         console.error('Delete Remapping Button not found in the DOM.')
+    }
+
+
+    if (hookButton) {
+        hookButton.addEventListener('click', async () => {
+            try {
+                if (isHookRunning) {
+                    isHookRunning = false;
+
+                    await window.api.stopHook();
+
+                    hookButton.innerText = "Start Hook";
+                    hookButton.style.backgroundColor = "red";
+                }
+
+                else {
+                    isHookRunning = true;
+
+                    await window.api.startHook();
+
+                    hookButton.innerText = "Stop Hook";
+                    hookButton.style.backgroundColor = "#218838";
+                }
+            }
+
+            catch (err) {
+                console.error("Error while interacting with the button :( -- Error: ", err.message);
+            };
+        });
+    }
+
+    else {
+        console.error('Hook Button not found in the DOM.')
     }
  });

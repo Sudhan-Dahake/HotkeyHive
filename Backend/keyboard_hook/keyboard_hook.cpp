@@ -9,6 +9,7 @@ HHOOK keyboardHook; // This is the hook handle.
 
 bool exitProgram = false; // Flag to exit the program;
 
+std::atomic<bool> *ptrToHookRunning;
 
 // Function to simulate a key combination.
 void SimulateKeyCombination(const std::string& keyCombo) {
@@ -85,9 +86,11 @@ LRESULT CALLBACK keyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         KBDLLHOOKSTRUCT *kbStruct = (KBDLLHOOKSTRUCT *)lParam;
 
         if ((wParam == WM_KEYDOWN) || (wParam == WM_SYSKEYDOWN)) {
-            if (kbStruct->vkCode == VK_ESCAPE) {
-                exitProgram = true;
-            };
+            // if (kbStruct->vkCode == VK_ESCAPE) {
+            //     exitProgram = true;
+
+            //     (*ptrToHookRunning).store(false);
+            // };
 
             // Detect Full key combinations.
             std::string keyCombo = GetKeyCombination(kbStruct);
@@ -131,7 +134,9 @@ LRESULT CALLBACK keyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 };
 
-void InstallKeyboardHook() {
+void InstallKeyboardHook(std::atomic<bool>* ptrToHookRunningLocalVar) {
+    ptrToHookRunning = ptrToHookRunningLocalVar;
+
     // Installing the keyboard hook.
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardProc, NULL, 0);
 

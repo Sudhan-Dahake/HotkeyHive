@@ -94,6 +94,28 @@ ipcMain.handle('delete-remapping', async (event, { application, originalKey }) =
 });
 
 
+ipcMain.handle('start-hook', async () => {
+    try {
+        return backend.startKeyboardHook();
+    }
+
+    catch (err) {
+        console.error("Cannot Start Hook :( -- Error: ", err.message);
+    };
+});
+
+
+ipcMain.handle('stop-hook', async () => {
+    try {
+        return backend.stopKeyboardHook();
+    }
+
+    catch (err) {
+        console.error("Cannot Stop Hook :( -- Error: ", err.message);
+    };
+});
+
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
