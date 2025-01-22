@@ -5,20 +5,22 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
+#include <atomic>
+#include <thread>
 
 #define FILENAME "remappings.txt"
 
 class BackendState {
     // static BackendState& instance;
 
-    BackendState() = default;
+    std::atomic<bool> hookRunning;
 
-    // std::map<std::string, std::vector<Remapping>> GetRemappingsInternally();
-
-    // std::mutex backendMutex;
+    std::thread* hookThread;
 
   public:
     static BackendState& Instance();
+
+    BackendState();
 
     BackendState(const BackendState&) = delete;
     BackendState& operator=(const BackendState &) = delete;
@@ -43,6 +45,8 @@ class BackendState {
 
     // Function to start the keyboard hook.
     void StartKeyboardHookForGUI();
+
+    void StopKeyboardHookForGUI();
 
     // Function to gracefully shut down the backend.
     void ShutdownBackendForGUI(std::map<std::string, std::vector<Remapping>> *appSpecificRemappings);

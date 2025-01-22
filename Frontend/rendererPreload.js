@@ -12,4 +12,6 @@ contextBridge.exposeInMainWorld('api', {
     addNewRemapping: (application, originalKey, remappedKey) => ipcRenderer.invoke('add-new-remapping', { application, originalKey, remappedKey }),
     getExecutableName: () => ipcRenderer.invoke('get-executable-name'),
     deleteRemapping: (application, originalKey) => ipcRenderer.invoke('delete-remapping', { application, originalKey }),
+    startHook: () => ipcRenderer.invoke('start-hook'),
+    stopHook: () => ipcRenderer.invoke('stop-hook'),
 });
