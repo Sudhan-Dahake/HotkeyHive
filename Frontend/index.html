@@ -76,6 +76,35 @@
       button:hover {
           background-color: #218838;
       }
+
+
+      #remappings-table {
+        width: 100%; /* Ensure the table spans the container */
+        border-collapse: collapse; /* Avoid spacing between table cells */
+        margin-top: 20px; /* Add some space above the table */
+      }
+
+      #remappings-table th, #remappings-table td {
+        border: 1px solid #ccc; /* Add borders for clarity */
+        padding: 10px; /* Add padding inside cells */
+        text-align: center; /* Align text to the left */
+      }
+
+      #remappings-table th {
+        background-color: #f4f4f4; /* Light gray background for headers */
+        font-weight: bold; /* Make headers bold */
+      }
+
+      #remappings-table tbody tr:hover {
+        background-color: #f0f8ff; /* Highlight the row on hover */
+      }
+
+      #remappings-container {
+        margin-top: 20px;
+        max-height: 300px; /* Add a max height with scrolling */
+        overflow-y: auto;
+      }
+
   </style>
 </head>
 <body>
@@ -92,6 +121,39 @@
     <div id="content">
         <h2>Welcome to Hotkey Hive</h2>
         <p>Click a button above to begin managing your key remappings.</p>
+
+
+
+
+
+
+
+        <!-- Application Dropdown -->
+        <!-- <div>
+            <label for="application-select">Select Application:</label>
+            <select id="application-select">
+                <option value="" disabled selected>Select an application</option>
+            </select>
+        </div>
+
+        <div id="remappings-container">
+            <table id="remappings-table">
+                <thead>
+                    <tr>
+                        <th>Original Key</th>
+                        <th>Remapped Key</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div> -->
+
+        <!-- Action Buttons -->
+        <!-- <div id="action-buttons">
+            <button id="edit-remapping" disabled>Edit</button>
+            <button id="delete-remapping" disabled>Delete</button>
+        </div> -->
     </div>
 
     <script src="renderer.js"></script>

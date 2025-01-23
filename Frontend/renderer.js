@@ -11,7 +11,129 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let isHookRunning = false;
 
-    console.log("Inside renderer.js, addRemappingButton's value: ", addRemappingButton);
+
+    function populateApplicationDropdownForView(applicationSelect) {
+        try {
+            // Fetching all the remappings.
+            return window.api.getAllRemappings().then((remappings) => {
+                for (const application in remappings) {
+                    const option = document.createElement('option');
+
+                    option.value = application;
+
+                    option.textContent = application;
+
+                    applicationSelect.appendChild(option);
+                }
+
+                return remappings;
+            });
+
+            // const remappings = await window.api.getAllRemappings();
+
+            // Object.keys(remappings).forEach((application) => {
+            //     const option = document.createElement('option');
+
+            //     option.value = application;
+
+            //     option.textContent = application;
+
+            //     applicationSelect.appendChild(option);
+            // });
+
+            // return remappings;
+        }
+
+        catch (err) {
+            console.error("Error fetch remappings: ", err.message);
+
+            return {};
+        };
+    };
+
+
+    function populateRemappingsTableForView(remappingsTableBody, remappings, application) {
+        remappingsTableBody.innerHTML = '';
+
+        if ((!remappings[application]) || (remappings[application].length === 0)) {
+            const noDataRow = document.createElement('tr');
+
+            noDataRow.innerHTML = `
+            <td colspan="2" style="text-align: center;">No remappings available</td>
+            `;
+
+            remappingsTableBody.appendChild(noDataRow);
+
+            return;
+        };
+
+
+        remappings[application].forEach((remap) => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+            <td>${remap.originalKey}</td>
+            <td>${remap.remappedKey}</td>
+            `;
+
+            remappingsTableBody.appendChild(row);
+        });
+    }
+
+
+    if (viewRemappingButton) {
+        viewRemappingButton.addEventListener('click', () => {
+            try {
+                const contentDiv = document.getElementById('content');
+
+                contentDiv.innerHTML = `
+                <!-- Application Dropdown -->
+                <div>
+                    <label for="application-select">Select Application:</label>
+                    <select id="application-select">
+                        <option value="" disabled selected>Select an application</option>
+                    </select>
+                </div>
+
+                <div id="remappings-container">
+                    <table id="remappings-table">
+                        <thead>
+                            <tr>
+                                <th>Original Key</th>
+                                <th>Remapped Key</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                `;
+
+                const applicationSelect = document.getElementById('application-select');
+
+                const remappingsTableBody = document.querySelector('#remappings-table tbody');
+
+
+                populateApplicationDropdownForView(applicationSelect).then((remappings) => {
+                    console.log(remappings);
+
+
+                    applicationSelect.addEventListener('change', (event) => {
+                        const selectedApplication = event.target.value;
+
+                        console.log(selectedApplication);
+
+                        populateRemappingsTableForView(remappingsTableBody, remappings, selectedApplication);
+                    });
+                });
+            }
+
+            catch (err) {
+                console.log("Inside renderer.js, viewRemappingButton failed. Error: ", err.message);
+            };
+        });
+    }
+
 
     if (addRemappingButton) {
         // Attach the event Listener to the button.
@@ -50,15 +172,26 @@ window.addEventListener('DOMContentLoaded', () => {
                 // Populating the dropdown list with running applications.
                 const applicationSelect = document.getElementById('application-select');
 
-                window.api.getRunningApplications().then((applications) => {
-                    applications.forEach((app) => {
-                        const option = document.createElement('option');
+                applicationSelect.addEventListener('click', () => {
+                    const currentValue = applicationSelect.value;
 
-                        option.value = app.executableName;
+                    applicationSelect.innerHTML = '';
 
-                        option.textContent = `${app.executableName}`;
+                    window.api.getRunningApplications().then((applications) => {
+                        applications.forEach((app) => {
+                            const option = document.createElement('option');
 
-                        applicationSelect.appendChild(option);
+                            option.value = app.executableName;
+
+                            option.textContent = `${app.executableName}`;
+
+                            applicationSelect.appendChild(option);
+                        });
+
+
+                        if (applications.some((app) => app.executableName === currentValue)) {
+                            applicationSelect.value = currentValue;
+                        };
                     });
                 });
 

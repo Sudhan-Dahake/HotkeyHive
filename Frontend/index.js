@@ -70,6 +70,17 @@ ipcMain.handle('get-running-applications', async () => {
 });
 
 
+ipcMain.handle('get-all-remappings', async () => {
+    try {
+        return backend.getAllRemappings();
+    }
+
+    catch (err) {
+        console.error("Failed to fetch remappings: ", err.message);
+    };
+ });
+
+
 ipcMain.handle('add-new-remapping', async (event, { application, originalKey, remappedKey }) => {
     try {
         return backend.addNewRemapping(application, originalKey, remappedKey);
