@@ -15,7 +15,7 @@ app.on('ready', () => {
 
     mainWindow.loadFile('index.html');
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     // Call the backend initialization function.
     try {
