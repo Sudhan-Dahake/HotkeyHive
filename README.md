@@ -64,9 +64,11 @@ Hotkey Hive is a powerful and user-friendly desktop application that allows you 
 
 
 ### **Download & Install**
+> **Note**: The installer is under development, please follow "Developer Section" instructions to run the application.
 
 1. **Download the `.exe` installer**:
    Visit the [GitHub Releases](information.html) page and download the latest installer for Windows.
+
 2. **Run the installer**:
    - Double-click the downloaded `.exe`.
    - Follow the on-screen instructions in the setup wizard.
