@@ -1,4 +1,4 @@
-# Hotkey Hive
+# HotkeyHive
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows-blue)](https://www.microsoft.com/windows)
