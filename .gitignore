@@ -6,3 +6,4 @@ native_backend/build
 Frontend/remappings.txt
 TestScripts/
 chromedriver-win64/
+Frontend/dist/

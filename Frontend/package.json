@@ -1,19 +1,56 @@
 {
-  "name": "frontend",
+  "name": "hotkey-hive",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "rebuild": "electron-rebuild",
+    "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [],
-  "author": "",
+  "author": "Sudhan Dahake",
   "license": "ISC",
-  "description": "",
+  "description": "HotkeyHive - A desktop application for remapping keys",
   "devDependencies": {
-    "electron": "^33.3.1"
+    "electron": "^33.3.1",
+    "electron-builder": "^24.6.0",
+    "electron-rebuild": "^3.2.9"
   },
   "dependencies": {
     "node-addon-api": "^8.3.0"
+  },
+  "build": {
+    "appId": "com.example.hotkeyhive",
+    "productName": "HotkeyHive",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+        "index.html",
+        "index.js",
+        "package-lock.json",
+        "package.json",
+        "renderer.js",
+        "rendererPreload.js",
+        "../native_backend/build/Release/backend.node"
+    ],
+    "extraResources": [
+        {
+            "from": "../native_backend/build/Release/",
+            "to": "native_backend/build/Release/"
+        }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "requireAdministrator"
+    }
   }
 }

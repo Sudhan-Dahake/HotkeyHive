@@ -28,9 +28,13 @@ std::string GetKeyCombination(KBDLLHOOKSTRUCT* kbStruct) {
     std::string keyCombo;
 
     // Checking for modifier keys
+    // if (GetAsyncKeyState(VK_LCONTROL) & 0x8000) keyCombo += "Left Ctrl+";
+    // if (GetAsyncKeyState(VK_RCONTROL) & 0x8000) keyCombo += "Right Ctrl+";
     if (GetAsyncKeyState(VK_CONTROL) & 0x8000) keyCombo += "Ctrl+";
-    if (GetAsyncKeyState(VK_SHIFT) & 0x8000)   keyCombo += "Shift+";
-    if (GetAsyncKeyState(VK_MENU) & 0x8000)    keyCombo += "Alt+";
+    if (GetAsyncKeyState(VK_SHIFT) & 0x8000) keyCombo += "Shift+";
+    // if (GetAsyncKeyState(VK_LMENU) & 0x8000) keyCombo += "Left Alt+";
+    // if (GetAsyncKeyState(VK_RMENU) & 0x8000) keyCombo += "Right Alt+";
+    if (GetAsyncKeyState(VK_MENU) & 0x8000) keyCombo += "Alt+";
 
     // Append the main key.
     keyCombo += GetReadableKeyName(kbStruct->vkCode);

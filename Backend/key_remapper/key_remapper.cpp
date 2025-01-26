@@ -104,5 +104,9 @@ void LoadRemappingsFromFile(std::map<std::string, std::vector<Remapping>>** ptrT
 
 // Getter for KeyRemappings
 std::map<std::string, std::vector<Remapping>> GetAllRemappings() {
+    if (appSpecificRemappings == nullptr) {
+        return {};
+    };
+
     return *appSpecificRemappings;
 };

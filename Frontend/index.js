@@ -1,5 +1,17 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const backend = require('../native_backend/build/Release/backend.node');
+// const backend = require('../native_backend/build/Release/backend.node');
+const path = require('path');
+
+// Determine the correct path to `backend.node`
+const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+const backendPath = isDev
+    ? path.join(__dirname, '../native_backend/build/Release/backend.node') // Development path
+    : path.join(process.resourcesPath, 'native_backend/build/Release/backend.node'); // Production path
+
+
+const backend = require(backendPath);
+
+module.exports = backend;
 
 let mainWindow;
 
