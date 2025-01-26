@@ -4,6 +4,7 @@
 #include "../key_remapper/key_remapper.h"
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 HHOOK keyboardHook; // This is the hook handle.
 
@@ -95,11 +96,30 @@ LRESULT CALLBACK keyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
             // Detect Full key combinations.
             std::string keyCombo = GetKeyCombination(kbStruct);
 
+
+            if ((keyCombo == "Left Alt+Tab") || (keyCombo == "Ctrl+Alt+Tab") || (keyCombo == "Alt+Tab")) {
+                // Log keyCombo to a file
+                std::ofstream logFile("key_combinations.log", std::ios::app); // Open in append mode
+
+                if (logFile.is_open()) {
+                    logFile << keyCombo << std::endl; // Write keyCombo to the file
+
+                    logFile.close(); // Close the file after writing
+                }
+
+                else {
+                    // Optionally, log an error message if the file could not be opened
+                    std::cerr << "Failed to open key_combinations.log for writing." << std::endl;
+                };
+            }
+
             std::string activeWindow = GetActiveWindowTitle();
 
             std::string activeExecutable = GetExecutableName(GetForegroundWindow());
 
             std::map<std::string, std::vector<Remapping>> appSpecificRemappings = GetAllRemappings();
+
+            // return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 
             for(const auto& [application, remappings] : appSpecificRemappings) {
                 if (activeExecutable.find(application) != std::string::npos) {
